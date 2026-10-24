@@ -1,0 +1,53 @@
+diff --git a/public/index.html b/public/index.html
+index e7a4e90..025d37f 100644
+--- a/public/index.html
++++ b/public/index.html
+@@ -4,6 +4,8 @@
+     <meta charset="utf-8" />
+     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+     <meta name="viewport" content="width=device-width, initial-scale=1" />
++    <meta name="apple-mobile-web-app-capable" content="yes" />
++    <meta name="apple-mobile-web-app-title" content="Sudoku" />
+     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+     <title>SudokuExchange.com</title>
+diff --git a/public/manifest.json b/public/manifest.json
+index 8640a15..65009ec 100644
+--- a/public/manifest.json
++++ b/public/manifest.json
+@@ -1,6 +1,6 @@
+ {
+   "short_name": "Sudoku",
+-  "name": "SudokuExchange.com",
++  "name": "Sudoku (offline)",
+   "icons": [
+     {
+       "src": "favicon.ico",
+diff --git a/src/index.js b/src/index.js
+index c01fc22..85496f7 100644
+--- a/src/index.js
++++ b/src/index.js
+@@ -1,7 +1,6 @@
+ import { createRoot } from 'react-dom/client';
+ import './index.css';
+ import App from './components/app/app';
+-import * as serviceWorker from './serviceWorker';
+ 
+ window.addEventListener('beforeunload', function (e) {
+     // If a puzzle is in progress, allow user to cancel page unload
+@@ -17,7 +16,11 @@ window.addEventListener('beforeunload', function (e) {
+ const root = createRoot(document.getElementById('root'));
+ root.render(<App />);
+ 
+-// If you want your app to work offline and load faster, you can change
+-// unregister() to register() below. Note this comes with some pitfalls.
+-// Learn more about service workers: https://bit.ly/CRA-PWA
+-serviceWorker.unregister();
++// Offline support: register the service worker that caches the app
++if ('serviceWorker' in navigator) {
++    window.addEventListener('load', () => {
++        navigator.serviceWorker.register('./sw.js').catch(err => {
++            console.error('Service worker registration failed:', err);
++        });
++    });
++}
